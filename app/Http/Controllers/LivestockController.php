@@ -12,18 +12,11 @@ class LivestockController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $email = $request->query('user_email');
-
-        $data = Livestock::where(
-            'user_email',
-            $email
-        )
-            ->latest()
-            ->get();
-
-        return response()->json($data);
+        return response()->json(
+            Livestock::all()
+        );
     }
     /**
      * Show the form for creating a new resource.
