@@ -116,23 +116,31 @@ class LivestockController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(
-        Request $request,
-        $id
-    ) {
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
         try {
-            $data =
-                Livestock::findOrFail($id);
-            $data->update([
-                'name' =>
-                $request->name,
-                'type' =>
-                $request->type,
-                'age' =>
-                $request->age,
-                'weight' =>
-                $request->weight
-            ]);
+            $data = Livestock::findOrFail($id);
+            $updateData = [
+                'name' => $request->name,
+                'type' => $request->type,
+                'age' => $request->age,
+                'weight' => $request->weight
+            ];
+            if ($request->hasFile('photo')) {
+                if ($data->photo) {
+                    Storage::disk('public')->delete($data->photo);
+                }
+
+                $path = $request->file('photo')->store('livestock', 'public');
+
+                $updateData['photo'] = $path;
+            }
+
+            $data->update($updateData);
+
             return response()->json([
                 'status' => 'success'
             ]);
