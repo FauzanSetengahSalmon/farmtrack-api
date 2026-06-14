@@ -16,12 +16,19 @@ class LivestockController extends Controller
     {
         $email = $request->query('user_email');
 
-        $data = Livestock::where(
-            'user_email',
-            $email
-        )
-            ->latest()
-            ->get();
+        if (!empty($email)) {
+            $data = Livestock::where('user_email', $email)
+                ->latest()
+                ->get();
+        } else {
+            $data = Livestock::latest()->get();
+        }
+        $data->transform(function ($item) {
+            if ($item->photo && !str_starts_with($item->photo, 'http')) {
+                $item->photo = 'https://farmtrack-api-production-51d6.up.railway.app/storage/' . $item->photo;
+            }
+            return $item;
+        });
 
         return response()->json($data);
     }
